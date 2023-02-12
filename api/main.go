@@ -44,6 +44,15 @@ func main() {
 		fmt.Println(whatThis, newGame)
 		c.IndentedJSON(http.StatusCreated, whatThis)
 	})
+	app.PUT("/keys", func(c *gin.Context) {
+		var newKey db.AccessKey
+		if err := c.BindJSON(&newKey); err != nil {
+			return
+		}
+		fmt.Println(newKey)
+		db.NewAccessKey(&newKey, *dbConn)
+		c.IndentedJSON(http.StatusCreated, newKey)
 
+	})
 	app.Run("127.0.0.1:8080")
 }

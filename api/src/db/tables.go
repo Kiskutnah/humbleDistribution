@@ -13,8 +13,8 @@ type HumbleGame struct {
 
 type AccessKey struct {
 	gorm.Model
-	ID   uint `gorm:"primary_key"`
-	Key  int  // will do a hexadecimal number
+	ID   uint   `gorm:"primary_key"`
+	Key  string // will do a hexadecimal number
 	Name string
 }
 
