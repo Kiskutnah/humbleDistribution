@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewGame(game HumbleGame, conn gorm.DB) HumbleGame {
+func NewGame(game *HumbleGame, conn gorm.DB) *HumbleGame {
 	res := conn.Create(&game)
 
 	fmt.Println(res.Error)

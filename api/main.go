@@ -39,9 +39,10 @@ func main() {
 			return
 		}
 		fmt.Println(newGame)
-		whatThis := db.NewGame(newGame, *dbConn)
+		whatThis := db.NewGame(&newGame, *dbConn)
 		fmt.Println(whatThis, newGame)
 		c.IndentedJSON(http.StatusCreated, whatThis)
 	})
+
 	app.Run("127.0.0.1:8080")
 }
