@@ -11,19 +11,20 @@ import (
 )
 
 // // TableName overrides the table name used by User to `profiles`
-// func (testTable) TableName() string {
-// 	return "testTable"
-// }
-// func JSONMiddleware() gin.HandlerFunc {
-//     return func(c *gin.Context) {
-//         c.Writer.Header().Set("Content-Type", "application/json")
-//         c.Next()
-//     }
-// }
+//
+//	func (testTable) TableName() string {
+//		return "testTable"
+//	}
+func JSONMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Content-Type", "application/json")
+		c.Next()
+	}
+}
 
 func main() {
 	app := gin.Default()
-	// app.Use(JSONMiddleware())
+	app.Use(JSONMiddleware())
 	dbConn := connections.DBInit()
 	dbConn.AutoMigrate(&db.HumbleGame{}, &db.AccessKey{}, &db.GameKey{})
 
