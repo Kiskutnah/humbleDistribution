@@ -6,15 +6,11 @@ import (
 
 	"main/src/connections"
 	"main/src/db"
+	"main/src/requests"
 
 	"github.com/gin-gonic/gin"
 )
 
-// // TableName overrides the table name used by User to `profiles`
-//
-//	func (testTable) TableName() string {
-//		return "testTable"
-//	}
 func JSONMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Content-Type", "application/json")
@@ -53,6 +49,27 @@ func main() {
 		db.NewAccessKey(&newKey, *dbConn)
 		c.IndentedJSON(http.StatusCreated, newKey)
 
+	})
+	app.POST("/redeem", func(c *gin.Context) {
+		var redemptionRequest requests.ReedemKey
+		if err := c.BindJSON(&redemptionRequest); err != nil {
+			return
+		}
+		fmt.Println(redemptionRequest)
+		isValidKey := db.CheckAccessKey(redemptionRequest.AccessKey, *dbConn)
+		// if it's not good we're aborting here
+		if !isValidKey {
+			c.AbortWithStatusJSON(401, gin.H{
+				"message": "Invalid Access key",
+			})
+			return
+		}
+		steamKey := db.GetGamekey(redemptionRequest.GameID, *dbConn)
+		c.JSON(http.StatusAccepted, gin.H{
+			"key": steamKey,
+		})
+		db.DeleteGameKey(uint(redemptionRequest.GameID), *dbConn)
+		db.DeleteAccessKey(redemptionRequest.AccessKey, *dbConn)
 	})
 	app.Run("127.0.0.1:8080")
 }
