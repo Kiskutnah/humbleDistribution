@@ -23,11 +23,14 @@ func NewAccessKey(key *AccessKey, conn gorm.DB) *AccessKey {
 	if err != nil {
 		panic(err)
 	}
-	testForUnique := AccessKey{}
 	for {
-		conn.Where(&AccessKey{Key: newKey}).First(&testForUnique)
-		if testForUnique.ID == 0 {
+		if CheckAccessKey(newKey, conn) {
 			break
+		} else {
+			newKey, err = generateAccessKey(64)
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 	key.Key = newKey
@@ -41,10 +44,27 @@ func NewAccessKey(key *AccessKey, conn gorm.DB) *AccessKey {
 	return key
 }
 
+func GenerateAccessKeyWrapper() (string, error) {
+	return generateAccessKey(64)
+}
 func generateAccessKey(len int) (string, error) {
 	bytes := make([]byte, len)
 	if _, err := rand.Read(bytes); err != nil {
 		return "", err
 	}
 	return hex.EncodeToString(bytes), nil
+}
+
+func DeleteAccessKey(key string, conn gorm.DB) AccessKey {
+	deletedAccessKey := AccessKey{}
+	conn.Where(&AccessKey{Key: key}).Delete(&deletedAccessKey)
+
+	return deletedAccessKey
+}
+
+func DeleteGameKey(ID uint, conn gorm.DB) HumbleGame {
+	deletedHubmleGame := HumbleGame{}
+	conn.Where(&HumbleGame{ID: ID}).Delete(&deletedHubmleGame)
+
+	return deletedHubmleGame
 }
